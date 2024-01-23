@@ -1,0 +1,4 @@
+1) I have a complete install of Ubuntu 20.04 LTS on VirtualBox
+2) I am ready to use Git and Github
+
+Note: my github username differs from the class standard: aaronpan-eng
