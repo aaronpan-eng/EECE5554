@@ -79,6 +79,8 @@ if __name__ == '__main__':
     rospy.logdebug("Using GPS on port "+serial_port+" at "+str(serial_baud))
     rospy.logdebug("Initializing sensor")
 
+    customgps_pub = rospy.Publisher('/gps', Customgps, queue_size = 5)
+
     try:
         while not rospy.is_shutdown():
             # gpggaRead = ReadFromSerial(serialPortAddr) #Do not modify
@@ -128,12 +130,13 @@ if __name__ == '__main__':
                 customgps.hdop = HDOP
                 customgps.gpgga_read = gpggaRead    
 
-                customgps_pub = rospy.Publisher("customgps", Customgps, queue_size = 10)
                 customgps_pub.publish(customgps)
                 print(customgps)
                 # rospy.sleep()
     except rospy.ROSInterruptException:
-        pass
+        port.close()
+    except serial.serialutil.SerialException:
+        rospy.loginfo("Shutting down paro_depth node...")
     # serialPortAddr = '/dev/ttyUSB0' #You will need to change this to the emulator or GPS puck port
     
     # lat_pub = rospy.Publisher("customgps"+'/latitude', Float64, queue_size = 10)
