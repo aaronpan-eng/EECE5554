@@ -1,10 +1,11 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
 
 from pickletools import uint8
 import rospy
 import utm
 import time
 import serial
+import sys
 
 from gps_driver.msg import Customgps
 
@@ -48,12 +49,13 @@ def UTCtoUTCEpoch(UTC):
     print(CurrentTime)
     return [CurrentTimeSec, CurrentTimeNsec]
 
-def ReadFromSerial(serialPortAddr):
-    serialPort = serial.Serial(serialPortAddr) #This line opens the port, do not modify
-    gpggaRead = serialPort.readline() #Replace this line with a 1-line code to read from the serial port
-    print(gpggaRead)
-    serialPort.close() #Do not modify
-    return gpggaRead
+# def ReadFromSerial(serialPortAddr):
+#     serialPort = serial.Serial(serialPortAddr) #This line opens the port, do not modify
+#     gpggaRead = serialPort.readline() #Replace this line with a 1-line code to read from the serial port
+#     print(gpggaRead)
+#     serialPort.close() #Do not modify
+#     return gpggaRead
+
 
 
 ###MAIN CODE###
@@ -63,25 +65,27 @@ if __name__ == '__main__':
     # isGPGGAinString(stringReadfromPort)
 
     # gpggaRead = '$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61'
-
+    port = sys.argv[1]
     customgps = Customgps()
     
-
+    # port = '/dev/pts/3'
     rospy.init_node('gps_driver')
-    port = '/dev/pts/5'
-    # serial_port = rospy.get_param('~port','/dev/pts/5')
-    # serial_baud = rospy.get_param('~baudrate',4800)
-    # port = serial.Serial(serial_port, serial_baud, timeout=3.)
+    
+    
+    serial_port = rospy.get_param(port,'/dev/pts/5')
+    serial_baud = rospy.get_param('~baudrate',4800)
+    port = serial.Serial(port, serial_baud, timeout=3.)
 
-    # rospy.logdebug("Using GPS on port "+serial_port+" at "+str(serial_baud))
+    rospy.logdebug("Using GPS on port "+serial_port+" at "+str(serial_baud))
     rospy.logdebug("Initializing sensor")
 
     try:
         while not rospy.is_shutdown():
             # gpggaRead = ReadFromSerial(serialPortAddr) #Do not modify
             
-            # gpggaRead = port.readline()
-            gpggaRead = ReadFromSerial(port)
+            gpggaRead = port.readline()
+            
+            # gpggaRead = ReadFromSerial(port)
             gpggaRead = str(gpggaRead)
             # print(gpggaRead)
             gpggaSplit = gpggaRead.split(",") #Put code here that will split gpggaRead into its components. This should only take one line.
