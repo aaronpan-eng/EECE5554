@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 
-from gps_driver.msg import Customgps
+# from gps_driver.msg import Customgps
 
 #function to take whats needed from the data
 def process_data(file):
