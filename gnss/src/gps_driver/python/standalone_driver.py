@@ -10,24 +10,17 @@ import sys
 from gps_driver.msg import Customgps
 
 ###FUNCTIONS###
-
-# def isGPGGAinString(inputString):
-#     if 1 == 1: #replace 1 == 1 with condition to be checked for inputString
-#         print('')
-#     else:
-#         print('')
-
 def degMinstoDegDec(LatOrLong):
     deg = int(LatOrLong/100) #Replace 0 with a line of code that gets just the degrees from LatOrLong
     mins = LatOrLong - (deg*100) #Replace 0 with a line of code that gets just the minutes from LatOrLong
     degDec = mins/60.0 #Replace 0 with a line of code that converts minutes to decimal degrees
-    print(deg+degDec)
+    # print(deg+degDec)
     return (deg+degDec)
 
 def LatLongSignConvetion(LatOrLong, LatOrLongDir):
     if LatOrLongDir == "W" or LatOrLongDir == "S": #Replace the blank string with a value
         LatOrLong *= -1 #some code here that applies negative convention
-        print(LatOrLong)
+        # print(LatOrLong)
     return LatOrLong
 
 def convertToUTM(LatitudeSigned, LongitudeSigned):
@@ -36,7 +29,7 @@ def convertToUTM(LatitudeSigned, LongitudeSigned):
     UTMNorthing = UTMVals[1]
     UTMZone = UTMVals[2]
     UTMLetter = UTMVals[3]
-    print(UTMVals)
+    # print(UTMVals)
     return [UTMEasting, UTMNorthing, UTMZone, UTMLetter]
 
 def UTCtoUTCEpoch(UTC):
@@ -49,29 +42,18 @@ def UTCtoUTCEpoch(UTC):
     print(CurrentTime)
     return [CurrentTimeSec, CurrentTimeNsec]
 
-# def ReadFromSerial(serialPortAddr):
-#     serialPort = serial.Serial(serialPortAddr) #This line opens the port, do not modify
-#     gpggaRead = serialPort.readline() #Replace this line with a 1-line code to read from the serial port
-#     print(gpggaRead)
-#     serialPort.close() #Do not modify
-#     return gpggaRead
-
-
 
 ###MAIN CODE###
 if __name__ == '__main__':
 
-    # stringReadfromPort = ''
-    # isGPGGAinString(stringReadfromPort)
-
-    # gpggaRead = '$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61'
+    #initializing port to argument from terminal
     port = sys.argv[1]
     customgps = Customgps()
     
-    # port = '/dev/pts/3'
+    #intializing node
     rospy.init_node('gps_driver')
     
-    
+    #initializing port params
     serial_port = rospy.get_param(port,'/dev/pts/5')
     serial_baud = rospy.get_param('~baudrate',4800)
     port = serial.Serial(port, serial_baud, timeout=3.)
@@ -79,25 +61,23 @@ if __name__ == '__main__':
     rospy.logdebug("Using GPS on port "+serial_port+" at "+str(serial_baud))
     rospy.logdebug("Initializing sensor")
 
+    #initialize publisher
     customgps_pub = rospy.Publisher('/gps', Customgps, queue_size = 5)
 
     try:
         while not rospy.is_shutdown():
-            # gpggaRead = ReadFromSerial(serialPortAddr) #Do not modify
-            
+            #read line from port
             gpggaRead = port.readline()
-            
-            # gpggaRead = ReadFromSerial(port)
             gpggaRead = str(gpggaRead)
-            # print(gpggaRead)
-            gpggaSplit = gpggaRead.split(",") #Put code here that will split gpggaRead into its components. This should only take one line.
-            # print(gpggaSplit)
-            # print(gpggaSplit[0])
-            # print(gpggaSplit[1])
 
+            #split by commas
+            gpggaSplit = gpggaRead.split(",") 
+
+            #checking if gpgga string is empty
             if gpggaSplit[2] == '' and (gpggaSplit[0] == "b'$GPGGA" or gpggaSplit[0] == "b'\\r$GPGGA"):
                 rospy.logwarn("GPS doesn't have good connection")
-            if gpggaSplit[0] == "b'$GPGGA" or gpggaSplit[0] == "b'\\r$GPGGA":
+            #if gpgga string not empty then proceed as normal below
+            elif gpggaSplit[0] == "b'$GPGGA" or gpggaSplit[0] == "b'\\r$GPGGA":
                 UTC = float(gpggaSplit[1]) #float
                 Latitude = float(gpggaSplit[2]) #float
                 LatitudeDir = str(gpggaSplit[3]) #string
@@ -105,7 +85,7 @@ if __name__ == '__main__':
                 LongitudeDir = str(gpggaSplit[5]) #string
                 HDOP = float(gpggaSplit[8]) #float
                 Altitude = float(gpggaSplit[9]) #float
-                print(Latitude)
+                # print(Latitude)
 
                 degDec_Latitude = degMinstoDegDec(Latitude)
                 degDec_Longitude = degMinstoDegDec(Longitude)
@@ -132,18 +112,9 @@ if __name__ == '__main__':
 
                 customgps_pub.publish(customgps)
                 print(customgps)
-                # rospy.sleep()
+                
     except rospy.ROSInterruptException:
         port.close()
     except serial.serialutil.SerialException:
         rospy.loginfo("Shutting down paro_depth node...")
-    # serialPortAddr = '/dev/ttyUSB0' #You will need to change this to the emulator or GPS puck port
-    
-    # lat_pub = rospy.Publisher("customgps"+'/latitude', Float64, queue_size = 10)
-    # long_pub = rospy.Publisher("customgps"+'/longitude', Float64, queue_size = 10)
-    # utmeasting_pub = rospy.Publisher("customgps"+'/utm_easting', Float64, queue_size = 10)
-    # utmnorthing_pub = rospy.Publisher("customgps"+'/utm_northing', Float64, queue_size = 10)
-    # utmzone_pub = rospy.Publisher("customgps"+'/utm_zone', uint8, queue_size = 10)
-    # utmletter_pub = rospy.Publisher("customgps"+'/utm_letter', string, queue_size = 10)
-    
     
