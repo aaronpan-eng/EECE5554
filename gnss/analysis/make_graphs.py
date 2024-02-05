@@ -120,7 +120,7 @@ a,b = np.polyfit(walk_easting, walk_northing, 1)
 
 plt.figure(5, figsize=(10, 8))
 plt.scatter(walk_easting, walk_northing, color='blue', label='Walking data')
-plt.scatter(walk_cent_easting, walk_cent_northing, marker='x', color='red', label='Walking centroid')
+# plt.scatter(walk_cent_easting, walk_cent_northing, marker='x', color='red', label='Walking centroid')
 plt.plot(walk_easting, a*walk_easting+b, linestyle = '--', color='orange', label = "Line of best fit")
 # plt.text(1,17, 'y = ' + '{:2.f}'.format(b) + ' + {:.2f}'.format(a) + 'x', size = 14)
 plt.xlabel('Easting (m)')

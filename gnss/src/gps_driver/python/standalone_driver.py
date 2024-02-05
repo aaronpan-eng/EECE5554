@@ -87,6 +87,7 @@ if __name__ == '__main__':
                 Altitude = float(gpggaSplit[9]) #float
                 # print(Latitude)
 
+                #calculations
                 degDec_Latitude = degMinstoDegDec(Latitude)
                 degDec_Longitude = degMinstoDegDec(Longitude)
 
@@ -97,6 +98,7 @@ if __name__ == '__main__':
 
                 CurrentTimeSec, CurrentTimeNsec = UTCtoUTCEpoch(UTC)
 
+                #setting messages to calculated values
                 customgps.header.frame_id = 'GPS1_Frame'
                 customgps.header.stamp.secs = CurrentTimeSec
                 customgps.header.stamp.nsecs = CurrentTimeNsec
@@ -110,6 +112,7 @@ if __name__ == '__main__':
                 customgps.hdop = HDOP
                 customgps.gpgga_read = gpggaRead    
 
+                #publishing
                 customgps_pub.publish(customgps)
                 print(customgps)
                 
