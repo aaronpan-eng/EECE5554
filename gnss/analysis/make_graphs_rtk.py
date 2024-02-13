@@ -59,7 +59,7 @@ def process_data(file):
         time = np.array(time)
         cent_northing = cent_northing - cent_northing
         cent_easting = cent_easting - cent_easting
-        
+
     return[easting_cent_dev, northing_cent_dev, altitude, time, cent_northing, cent_easting]
 
 def RMSE_stationary(northing, easting, cent_northing, cent_easting):
@@ -72,11 +72,16 @@ def RMSE_walking(a,b,x_actual,y_actual):
     err = y_ideal - y_actual
     RMSE = np.sqrt(np.mean(err**2))
     return RMSE
-
+    
 #processing data for occluded, unoccluded, and walking (REGULAR GPS)
-occ_easting, occ_northing, occ_altitude, occ_time, occ_cent_northing, occ_cent_easting = process_data('occluded_test.bag')
-unocc_easting, unocc_northing, unocc_altitude, unocc_time, unocc_cent_northing, unocc_cent_easting = process_data('unoccluded_test.bag')
-walk_easting, walk_northing, walk_altitude, walk_time, walk_cent_northing, walk_cent_easting = process_data('walking_test.bag')
+# occ_easting, occ_northing, occ_altitude, occ_time, occ_cent_northing, occ_cent_easting = process_data('occluded_test.bag')
+# unocc_easting, unocc_northing, unocc_altitude, unocc_time, unocc_cent_northing, unocc_cent_easting = process_data('unoccluded_test.bag')
+# walk_easting, walk_northing, walk_altitude, walk_time, walk_cent_northing, walk_cent_easting = process_data('walking_test.bag')
+
+#processing data for occluded, unoccluded, and walking (RTK GPS)
+occ_easting, occ_northing, occ_altitude, occ_time, occ_cent_northing, occ_cent_easting = process_data('rtk_occluded.bag')
+unocc_easting, unocc_northing, unocc_altitude, unocc_time, unocc_cent_northing, unocc_cent_easting = process_data('rtk_open.bag')
+walk_easting, walk_northing, walk_altitude, walk_time, walk_cent_northing, walk_cent_easting = process_data('rtk_walking.bag')
 
 #occluded and unoccluded northing vs easting
 plt.figure(1, figsize=(10, 8))
@@ -89,17 +94,18 @@ plt.ylabel('Northing (m)')
 plt.legend()
 plt.title('Stationary Northing vs. Easting')
 
-#RMSE for northing and easting data
+#RMSE for northing and easting for TRK
 RMSE_occ = RMSE_stationary(occ_northing, occ_easting, occ_cent_northing, occ_cent_easting)
-print("RMSE for occluded data is: ", RMSE_occ)
+print("RMSE for occluded RTK data is: ", RMSE_occ)
 
 RMSE_unocc = RMSE_stationary(unocc_northing, unocc_easting, unocc_cent_northing, unocc_cent_easting)
-print("RMSE for unoccluded data is: ", RMSE_unocc)
+print("RMSE for unoccluded RTK data is: ", RMSE_unocc)
 
 #occluded and unoccluded alt vs time
 #calculations to normalize the time so that the 2 lines can be overlayed
 occ_time = occ_time - occ_time[0]
 unocc_time = unocc_time - unocc_time[0]
+
 
 plt.figure(2, figsize=(10, 8))
 plt.scatter(occ_time, occ_altitude, color='red', label='Occluded altitude')
@@ -115,7 +121,7 @@ distance_occ = np.sqrt((occ_easting)**2 + (occ_northing)**2)
 
 fig, axs = plt.subplots(2,figsize=(10,8))
 axs[0].hist(distance_occ, bins = 15, color='red', label='Occluded')
-axs[0].set_xlim(0,17.5)
+axs[0].set_xlim(0,6)
 # axs[0].set_xlabel('Euclidean dist to centroid (m)')
 axs[0].set_ylabel('Frequency')
 axs[0].legend()
@@ -125,7 +131,7 @@ axs[0].set_title('Stationary Occluded and Unoccluded Histograms')
 distance_unocc = np.sqrt((unocc_easting)**2 + (unocc_northing)**2)
 
 axs[1].hist(distance_unocc, bins = 15, color='blue', label='Unoccluded')
-axs[1].set_xlim(0,17.5)
+axs[1].set_xlim(0,6)
 axs[1].set_xlabel('Euclidean dist to centroid (m)')
 axs[1].set_ylabel('Frequency')
 axs[1].legend()
@@ -144,9 +150,9 @@ plt.ylabel('Northing (m)')
 plt.legend()
 plt.title('Walking Northing vs. Easting')
 
-#error calculation for walking data
+#error calculation for walking RTK data
 RMSE_walking = RMSE_walking(a,b,walk_easting,walk_northing)
-print("RMSE for walking data is: ", RMSE_walking)
+print("RMSE for walking RTK data is: ", RMSE_walking)
 
 #walking alt vs time
 #normalizing calc below
